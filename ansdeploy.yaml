@@ -1,0 +1,19 @@
+---
+- hosts: kops
+  become: yes
+  tasks:
+
+    - name: Authenticate with Amazon ECR
+      shell: "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 627316422993.dkr.ecr.us-east-1.amazonaws.com"
+
+    - name: Build Docker image
+      command: docker build -t task-repository /opt/proj
+      args:
+        chdir: /opt/proj
+
+    - name: Tag Docker image
+      command: docker tag task-repository:latest 627316422993.dkr.ecr.us-east-1.amazonaws.com/task-repository:latest
+
+    - name: Push Docker image
+      command: docker push 627316422993.dkr.ecr.us-east-1.amazonaws.com/task-repository:latest
+
